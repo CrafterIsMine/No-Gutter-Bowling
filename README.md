@@ -2,7 +2,9 @@
 
 **No gutter bowling is a dynamic 2D smash and explode type bowling game built for players who are bored of standard bowling games and want to try something different. This game adds pins as enemies and the goal is to destroy the pins as long as the game doesn't break with obstacles and enemies.**
 
-This game is quite different from the standard one lane bowling games because it employs different directions as the player can drag the ball back and release it to collide with walls and destroy the enemy pins. The player has the advantage of using the blast as well that destroys any obstacle or enemy in it's path, making it easier for the next round. There are a total of 2 rounds in one pattern and player has to try and get them all before the pattern switches.
+This game is quite different from the standard one lane bowling games because it employs different directions as the player can drag the ball back and release it to collide with walls and destroy the enemy pins. The player has the advantage of using the blast as well that destroys any obstacle or enemy in it's path, making it easier for the next round. There are a total of 2 rounds in one pattern and player has to try and get them all before the pattern switches. 
+
+**There are even red enemies that reduce score upon player contact but can be blown to shreds using explosions**
 
 **Controls:**
 
