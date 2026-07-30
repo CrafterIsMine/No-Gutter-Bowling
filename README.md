@@ -14,6 +14,6 @@ This game is quite different from the standard one lane bowling games because it
 This game is inspired by drag and click games that people play on mobile and making the enemy patterns different every time was the primary challenge in making 
 this game. Usually, indie devs would just drop in a library like Matter.js for collision detection. I wanted to do it myself. Coding the custom circle-rectangle collision math for the obstacles, and implementing the "hitstop" (freezing the game loop for a few milliseconds on impact) to make the enemy smashes actually feel punchy and weighty, was a tough but incredibly rewarding hurdle to overcome.
 
-<h4>Theme: Indie Gamedev</h4>
+<h2>Theme: Indie Gamedev</h2>
 
 I think the game suits this theme perfectly because it was built entirely from the ground up using raw web technologies without the crutch of an external game engine. It focuses purely on creating an addictive, and experimental gameplay loop and i was also thinking it could be a rival to the classic dino runner on chrome. It doesn't have a massive budget or a team of 50 people; it's just a fun game with endless replayability.
