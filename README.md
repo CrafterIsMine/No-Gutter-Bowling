@@ -16,4 +16,4 @@ this game. Usually, indie devs would just drop in a library like Matter.js for c
 
 <h2>Theme: Indie Gamedev</h2>
 
-I think the game suits this theme perfectly because it was built entirely from the ground up using raw web technologies without the crutch of an external game engine. It focuses purely on creating an addictive, and experimental gameplay loop and i was also thinking it could be a rival to the classic dino runner on chrome. It doesn't have a massive budget or a team of 50 people; it's just a fun game with endless replayability.
+I think the game suits this theme perfectly because it was built entirely from the ground up using raw web technologies without the crutch of an external game engine. It focuses purely on creating an addictive, and experimental gameplay loop and i was also thinking it could be a rival to the classic dino runner on chrome. It doesn't have a massive budget or a team of 50 people and it's just a fun game with endless replayability.
