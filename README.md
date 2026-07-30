@@ -6,7 +6,7 @@ This game is quite different from the standard one lane bowling games because it
 
 **Controls:**
 
-1. Player can spam the spacebar for explosions
+1. Player can spam the **spacebar** for explosions
 2. Dragging and releasing the bowling ball will be the core movement for this game
 
 <h1>Inspiration and challenges:</h1>
