@@ -1,8 +1,7 @@
 W = window.innerWidth
 H = window.innerHeight
 b ={
-x: W / 2,
-y: H * 0.85,
+x: W / 2, y: H * 0.85,
 vx: 0,
 vy: 0,
 r: 22,
@@ -13,22 +12,37 @@ pins = []
 bombs = []
 parts = []
 obs = []
+trail = []
+blast = null
+
 score = 0
 frame = 1
 roll = 1
 chain = 0
+maxC = 0
 state = 'aim'
 drag = false
 mx = 0
 my = 0
 diff = 1
 ret = false
+stuck = 0
+blastReady = false
+roundCleared = false
 sEl = document.getElementById('s')
+mEl = document.getElementById('m')
+bEl = document.getElementById('blastMsg')
+
 function setupWave(){
 pins = []
 bombs = []
 obs = []
 ret = false
+trail = []
+blast = null
+stuck = 0
+blastReady = false
+roundCleared = false
 let sx = W / 2
 let sy = H * 0.2
 let sp = 65
@@ -38,7 +52,7 @@ for(let c = 0; c <= r; c++){
 let px = sx + (c - r / 2) * sp
 let py = sy + r * sp * 0.866
 if(Math.random() > 0.85 && diff > 2){
-bombs.push({ x: px, y: py, r: 20, alive: true })
+bombs.push({ x: px, y: py, r: 20, alive: true, fade: 1 })
 }
 else{
 pins.push({ x: px, y: py, r: 20, alive: true, fade: 1 })
@@ -63,17 +77,76 @@ b.active = false
 state = 'aim'
 drag = false
 ret = false
+blastReady = false
 chain = 0
-document.getElementById('m').classList.remove('hidden')
+trail = []
+blast = null
+stuck = 0
+mEl.classList.remove('hidden')
+mEl.innerText = 'DRAG TO AIM'
+bEl.classList.add('hidden')
 }
+
 function burst(x, y, col, n){
 for(let i = 0; i < n; i++){
 let a = Math.random() * Math.PI * 2
 let s = 2 + Math.random() * 7
 parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 40, col, sz: 3 + Math.random() * 5 })
- } 
+ }
 }
+function triggerBlast(){
+if(!blastReady || !b.active)
+return
+blastReady = false
+bEl.classList.add('hidden')
+sndBlast()
+
+let br = 150
+let d = 0
+blast ={
+x: b.x,
+y: b.y,
+r: 0,
+mr: br,
+life: 20 
+}
+for(let e of pins){
+if(Math.hypot(e.x - b.x, e.y - b.y) < br){
+e.alive = false
+d++
+score += 15
+burst(e.x, e.y, '#ff8844', 15)
+ }
+}
+for(let e of bombs){
+if(Math.hypot(e.x - b.x, e.y - b.y) < br){
+e.alive = false
+d++
+score += 15
+burst(e.x, e.y, '#ff4444', 20)
+ }
+}
+for(let e of obs){
+let dx = (e.x + e.w / 2) - b.x
+let dy = (e.y + e.h / 2) - b.y
+if(Math.hypot(dx, dy) < br + 40){
+e.alive = false
+d++
+score += 15
+burst(e.x + e.w / 2, e.y + e.h / 2, '#ff6666', 15)
+ }
+}
+score += d * 10
+sEl.innerText = Math.floor(score)
+if(!pins.some(p => p.alive) && !bombs.some(p => p.alive)){
+advanceRound()
+ }
+}
+
 function advanceRound(){
+if(roundCleared)
+return
+roundCleared = true
 if(roll === 1){
 score += 50 + diff * 20
 sndStrike()
@@ -82,11 +155,15 @@ frame++
 diff = Math.floor(frame / 2) + 1
 roll = 1
 chain = 0
+maxC = 0
 sEl.innerText = Math.floor(score)
 setupWave()
 resetBall()
 }
+
 function step(){
+if(roundCleared)
+return
 for(let i = parts.length - 1; i >= 0; i--){
 let p = parts[i]
 p.x += p.vx
@@ -96,15 +173,34 @@ p.vy *= .92
 if(--p.life <= 0)
 parts.splice(i, 1)
 }
+for(let p of pins){
+if(!p.alive && p.fade > 0)
+p.fade -= .04
+}
+if(blast){
+blast.r += (blast.mr - blast.r) * .2
+if(--blast.life <= 0)
+blast = null
+}
 
-if(state !== 'roll')
+if(state !== 'roll') 
 return
-
 let spd = Math.hypot(b.vx, b.vy)
+
+if(spd > 1.5){
+trail.push({ x: b.x, y: b.y, life: 25, sz: b.r * .9 })
+}
+for(let i = trail.length - 1; i >= 0; i--){
+trail[i].life--
+trail[i].sz *= .94
+if(trail[i].life <= 0)
+trail.splice(i, 1)
+}
 b.x += b.vx
 b.y += b.vy
 b.vx *= .992
 b.vy *= .992
+stuck++
 
 if(b.x < b.r){
 b.x = b.r; b.vx = Math.abs(b.vx) * .6; sndWall() 
@@ -112,7 +208,7 @@ b.x = b.r; b.vx = Math.abs(b.vx) * .6; sndWall()
 if(b.x > W - b.r){
 b.x = W - b.r; b.vx = -Math.abs(b.vx) * .6; sndWall() 
 }
-if(b.y < b.r){
+if(b.y < b.r){ 
 b.y = b.r; b.vy = Math.abs(b.vy) * .6; sndWall() 
 }
 if(b.y > H + b.r + 50 && !ret){
@@ -121,7 +217,6 @@ b.y = H + b.r + 100
 b.vx = 0
 b.vy = -5
 }
-
 if(ret && b.vy < 0 && b.y <= H * 0.85){
 b.y = H * 0.85
 b.vy = 0
@@ -136,6 +231,7 @@ advanceRound()
 else if(roll === 1){
 roll = 2
 chain = 0
+maxC = 0
 resetBall()
 }
 else{
@@ -143,7 +239,6 @@ advanceRound()
 }
 return
 }
-
 for(let o of obs){
 if(!o.alive)
 continue
@@ -163,8 +258,9 @@ b.vx = (b.vx - 2 * dot * nx) * .7
 b.vy = (b.vy - 2 * dot * ny) * .7
 }
 sndClack()
- }
 }
+}
+
 for(let bm of bombs){
 if(!bm.alive)
 continue
@@ -188,6 +284,8 @@ if(dist < b.r + p.r && spd > 1){
 p.alive = false
 p.fade = 1
 chain++
+if(chain > maxC)
+maxC = chain
 score += 10 * (1 + chain * .3)
 sEl.innerText = Math.floor(score)
 sndHit(chain)
@@ -198,10 +296,16 @@ if(!pins.some(pi => pi.alive) && !bombs.some(bi => bi.alive)){
 advanceRound()
 return
  }
-  }
+ } 
 }
 if(spd < .2 && !ret && b.y < H * 0.75){
 ret = true
 b.vy = -4
 }
+if(spd > 3 && !blastReady && !blast){
+blastReady = true
+bEl.classList.remove('hidden')
+}
+if(stuck > 600 && state === 'roll')
+resetBall()
 }
